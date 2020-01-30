@@ -1,3 +1,27 @@
+/***********************************************************************\
+
+    Program to spy on a stdin/stdout pipe communication between two
+    processes, the caller and the target.
+
+    thoni56/Thomas Nilefalk - January 2020
+
+    Make the caller exec this program instead of the real target and
+    ensure that the TARGET variable points to the target using a full
+    path.
+
+    Then, when called, this program, the parent, will set up three
+    child processes, one spy for each of the downstream and upstream
+    communication flows and a third which will exec the real target.
+    The downstream and upstream childs will hook in to the stdin and
+    stdout of the parent and thus read from the output pipe of the
+    caller and write to the input pipe it has set up.
+
+    The parent process will setup pipes so that the spy childs can
+    hook their pipes to the exec'ed target process.
+    While propagating the communication the children will also copy
+    that to a logfile.
+
+\**********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
