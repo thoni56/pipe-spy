@@ -10,7 +10,7 @@ details of this communication I wanted to spy in that conversation.
 
 ## Alternatives
 
-Actually I could not find any alternatives here. My question on
+Actually I could not find any alternatives here. [My question](https://stackoverflow.com/questions/59937720/how-to-inject-logging-of-communication-over-pipes) on
 stackoverflow did not get any answers and googling found none either.
 
 I'm happy to add some alternatives here, if you'd like to share.
