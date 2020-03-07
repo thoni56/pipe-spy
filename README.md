@@ -1,5 +1,6 @@
 # pipe-spy
 
+<<<<<<< HEAD
 A C-program that can be injected between two processes to spy on their communcation over pipes.
 
 ## Use case
@@ -22,18 +23,32 @@ So I implemented this little utility.
 
 ## Usage
 
-Set the TARGET variable (environment or Makefile) to point to the
-actual `target` and compile.
+You have to find a way to get the `caller` to exec `pipe-spy` instead
+of the actual `target`. You compile this source and place it or
+soft-link in a place where your caller will find it, thinking it is
+the real program it calls.
 
-Then you have to find a way to get the `caller` to exec this instead of the
-actual `target`. The way I used it was to create a link to `pipe-spy`
-with the same name as the actual target but in a directory that was
-earlier in the PATH. This might not always be possible, so YMMV.
+The way I used it was to create a link to `pipe-spy` with the same
+name as the actual target but in a directory that was earlier in the
+PATH. This might not always be possible, so YMMV.
+
+You can specify the real target either as a compile-time constant
+
+    $(CC) -DTARGET=<target> ...
+
+or as an environment variable:
+
+    TARGET=<target> <command-that-invokes-pipe-spy>
 
 If the `caller` tries to exec the actual `target` this utility will
 instead be run. It will in turn exec the `target` and spy and log the
-downstream and upstream communication in a file
-(`/tmp/pipe-spyPID.log`).
+downstream and upstream communication in a file.
+
+This file is by default `/tmp/pipe-spyPID.log`, but you can change
+where that logging goes using an environment variable:
+
+    LOGFILE=<logfile> <command-that-invokes-pipe-spy>
+
 
 ## Implementation
 
@@ -53,3 +68,13 @@ The complicated part is to set up the pipes correctly.
   changed).
 
 PR:s are welcome.
+=======
+A C-program that can be injected between two processes to spy on thier
+communcation over pipes.
+
+
+You also have to tell `pipe-spy` which program it should invoke so
+that the communication can be established, creating a
+man-in-the-middle setup where `pipe-spy` is the man in the middle.
+
+You can define the TARGET either through a compile-time constant:

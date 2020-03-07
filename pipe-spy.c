@@ -24,6 +24,7 @@
 \**********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/wait.h>
@@ -39,13 +40,35 @@ FILE *logFile;
 
 
 int main(int argc, char **argv) {
-    bool trace = false;
+    bool trace = false;         /* To trace, you must change this using
+                                   the debugger. We can't add an
+                                   option for this since we don't
+                                   control argc/argv, the caller does.
+                                   And we don't want to have to change
+                                   it... */
     char logFileName[100];
+    char *fileName;
+#ifdef TARGET
+    char *target = TARGET;
+#else
+    char *target = getenv("TARGET");
+#endif
 
-    sprintf(logFileName, "/tmp/pipespy%d.log", getpid());
+    fileName = getenv("LOGFILE");
+    if (fileName != NULL)
+        strcpy(logFileName, fileName);
+    else
+        sprintf(logFileName, "/tmp/pipespy%d.log", getpid());
     logFile = fopen(logFileName, "w");
-    for (int arg=0; arg<argc; arg++)
-        fprintf(logFile, "%s ", argv[arg]);
+
+    if (target == NULL) {
+        fprintf(logFile, "*** ERROR: NO pipe-spy TARGET DEFINED, neither compile-time or environment ***");
+        exit(-1);
+    }
+
+    /* Log arguments to the command on the first line in the log */
+    for (int a=0; a<argc; a++)
+        fprintf(logFile, "%s ", argv[a]);
     fprintf(logFile, "\n");
     fflush(logFile);
 
@@ -132,9 +155,9 @@ int main(int argc, char **argv) {
         if (trace) { fprintf(logFile, "** target child did dup2 in write end\n");  fflush(logFile); }
         /* ... and exec ... */
         if (trace) { fprintf(logFile, "** target child to execv\n");  fflush(logFile); }
-        execv(TARGET, argv);
+        execv(target, argv);
         /* ... if we get here execv failed... */
-        perror(TARGET);
+        perror(target);
         _exit(1);
     }
     if (trace) { fprintf(logFile, "** parent forked target to %d\n", target_pid);  fflush(logFile); }
